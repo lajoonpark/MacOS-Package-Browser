@@ -140,24 +140,9 @@ struct PackageListView: View {
     }
 }
 
-/// Small colored chip naming the package manager a row came from.
-struct SourceBadge: View {
-    let sourceID: PackageSourceID
-
-    private var label: String {
-        switch sourceID {
-        case .homebrew: "Homebrew"
-        case .bun: "Bun"
-        case .npm: "npm"
-        case .nix: "Nix"
-        case .pkgx: "pkgx"
-        case .pip: "pip"
-        case .cargo: "Cargo"
-        case .gem: "RubyGems"
-        }
-    }
-
-    private var color: Color {
+/// Shared per-manager color mapping used by badges, charts, and the icon.
+enum SourcePalette {
+    static func color(for sourceID: PackageSourceID) -> Color {
         switch sourceID {
         case .homebrew: .orange
         case .bun: .yellow
@@ -170,12 +155,30 @@ struct SourceBadge: View {
         }
     }
 
+    static func label(for sourceID: PackageSourceID) -> String {
+        switch sourceID {
+        case .homebrew: "Homebrew"
+        case .bun: "Bun"
+        case .npm: "npm"
+        case .nix: "Nix"
+        case .pkgx: "pkgx"
+        case .pip: "pip"
+        case .cargo: "Cargo"
+        case .gem: "RubyGems"
+        }
+    }
+}
+
+/// Small colored chip naming the package manager a row came from.
+struct SourceBadge: View {
+    let sourceID: PackageSourceID
+
     var body: some View {
-        Text(label)
+        Text(SourcePalette.label(for: sourceID))
             .font(.caption.weight(.medium))
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(color.opacity(0.18), in: Capsule())
-            .foregroundStyle(color)
+            .background(SourcePalette.color(for: sourceID).opacity(0.18), in: Capsule())
+            .foregroundStyle(SourcePalette.color(for: sourceID))
     }
 }

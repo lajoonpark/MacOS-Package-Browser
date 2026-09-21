@@ -1,18 +1,30 @@
 import SwiftUI
 
+/// What the sidebar selection points at.
+enum SidebarItem: Hashable {
+    case dashboard
+    case allPackages
+    case source(String)
+}
+
 struct SidebarView: View {
     @ObservedObject var store: PackageStore
-    @Binding var selection: String?
+    @Binding var selection: SidebarItem?
 
     var body: some View {
         List(selection: $selection) {
-            allRow
-                .tag(String?.none)
+            dashboardRow
+                .tag(SidebarItem.dashboard)
+
+            Section("Library") {
+                allRow
+                    .tag(SidebarItem.allPackages)
+            }
 
             Section {
                 ForEach(store.sources) { source in
                     sourceRow(source)
-                        .tag(Optional(source.id))
+                        .tag(SidebarItem.source(source.id))
                         .contextMenu {
                             Button("Rescan") {
                                 Task { await store.rescan(sourceID: source.id) }
@@ -28,6 +40,17 @@ struct SidebarView: View {
         }
         .listStyle(.sidebar)
         .navigationTitle("Package Browser")
+    }
+
+    private var dashboardRow: some View {
+        HStack {
+            Label {
+                Text("Dashboard")
+            } icon: {
+                Image(systemName: "square.grid.2x2")
+                    .foregroundStyle(.tint)
+            }
+        }
     }
 
     private var allRow: some View {

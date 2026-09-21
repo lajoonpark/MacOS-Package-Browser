@@ -6,6 +6,11 @@ Package Browser is a small SwiftUI app that scans every package manager on
 your machine and shows everything you've installed in a single, searchable
 list — no terminal required.
 
+A **Dashboard** opens by default with your library at a glance: installed
+total, pending updates, active managers, and a donut chart of how your
+packages are composed across managers (click a slice's legend row to jump
+to that manager's list).
+
 ## Supported package managers
 
 | Manager  | What it shows                          |
