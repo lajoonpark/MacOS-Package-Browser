@@ -28,7 +28,7 @@ struct ContentView: View {
             SidebarView(store: store, selection: sidebarSelection)
         } detail: {
             DashboardView(store: store) { id in
-                selection = .source(id)
+                select(.source(id))
             }
         }
     }
@@ -48,13 +48,26 @@ struct ContentView: View {
         selectedPackageID.flatMap { store.package(withID: $0) }
     }
 
-    /// Switching sidebar items drops any package selection from the previous list.
+    /// Central place for sidebar selection: updates the selected source in the
+    /// store (which drives filtering) and clears any old package selection.
+    private func select(_ item: SidebarItem) {
+        sidebarSelection.wrappedValue = item
+    }
+
+    /// Switching sidebar items drops any package selection from the previous list
+    /// and tells the store which source the list should filter by.
     private var sidebarSelection: Binding<SidebarItem?> {
         Binding(
             get: { selection },
             set: { newValue in
                 selection = newValue
                 selectedPackageID = nil
+                switch newValue {
+                case .source(let id):
+                    store.selectedSourceID = id
+                case .dashboard, .allPackages, nil:
+                    store.selectedSourceID = nil
+                }
             }
         )
     }
